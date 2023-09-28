@@ -150,6 +150,9 @@ fork(void)
   np->parent = proc;
   *np->tf = *proc->tf;
 
+  /* Added by me - Used to copy the mask*/
+  np->tracemask = proc->tracemask;
+
   // Clear %rax so that fork returns 0 in the child.
   np->tf->rax = 0;
 

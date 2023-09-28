@@ -87,3 +87,15 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+/* Added by me - Used for tracing system calls*/
+uint64
+sys_ptrace(void)
+{
+  
+  if (argint(0, &proc->tracemask) < 0) {
+    return -1;
+  }
+  cprintf("inside ptrace call: %d", proc->tracemask);
+  return proc->tracemask;
+}

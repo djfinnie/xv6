@@ -40,6 +40,7 @@ sleeplock.o: sleeplock.c types.h defs.h param.h x86.h memlayout.h mmu.h \
  proc.h spinlock.h sleeplock.h
 spinlock.o: spinlock.c types.h defs.h param.h x86.h memlayout.h mmu.h \
  proc.h spinlock.h
+strace.o: strace.c types.h stat.h user.h
 stressfs.o: stressfs.c types.h stat.h user.h fs.h fcntl.h
 string.o: string.c types.h x86.h
 syscall.o: syscall.c types.h defs.h param.h memlayout.h mmu.h proc.h \

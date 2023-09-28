@@ -48,6 +48,7 @@ fetchstr(addr_t addr, char **pp)
   return -1;
 }
 
+/* Checks the registers and returns whatever is in them*/
 static addr_t
 fetcharg(int n)
 {
@@ -69,6 +70,7 @@ argint(int n, int *ip)
   return 0;
 }
 
+/* Go get what ever arg is at rax and assume its a pointer*/
 int
 argaddr(int n, addr_t *ip)
 {
@@ -126,6 +128,7 @@ extern addr_t sys_unlink(void);
 extern addr_t sys_wait(void);
 extern addr_t sys_write(void);
 extern addr_t sys_uptime(void);
+extern addr_t sys_ptrace(void);
 
 // PAGEBREAK!
 static addr_t (*syscalls[])(void) = {
@@ -150,6 +153,7 @@ static addr_t (*syscalls[])(void) = {
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
+[SYS_ptrace]  sys_ptrace,
 };
 
 char *syscallnames[] = {
@@ -174,6 +178,7 @@ char *syscallnames[] = {
 [SYS_link]    "link",
 [SYS_mkdir]   "mkdir",
 [SYS_close]   "close",
+[SYS_ptrace]  "p_trace",
  };
 
 void
@@ -184,12 +189,6 @@ syscall(struct trapframe *tf)
   proc->tf = tf;
   uint64 num = proc->tf->rax;
   if (num > 0 && num < NELEM(syscalls) && syscalls[num]) {
-    /* Added by me- used to print all system calls*/
-    if (prev_num != num){
-      cprintf("\n%d: syscall %s -> %d \n", 
-          proc->pid, syscallnames[num], num);
-      prev_num = num;
-    }
     tf->rax = syscalls[num]();
 
   } else {
@@ -197,6 +196,13 @@ syscall(struct trapframe *tf)
             proc->pid, proc->name, num);
     tf->rax = -1;
   }
+
+    cprintf("proc->tracemask>>num: %d\n proc->tracemask: %d \n num: %d\n ", proc->tracemask >> num, proc->tracemask, num);
+  if (proc->tracemask >> num) {
+	  cprintf("%d: syscall %s -> %d\n", 
+			  proc->pid, syscallnames[num], tf->rax);
+  }
+
   if (proc->killed)
     exit();
 }
